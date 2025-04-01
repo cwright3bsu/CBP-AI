@@ -83,7 +83,8 @@ export default function GPTChatSimulation() {
     setAsked([]);
   }, [profileIndex]);
 
-  const handleSend = async () => {
+  const handleSend = (e) => {
+    e?.preventDefault?.();
     const trimmed = input.trim();
     if (!trimmed) return;
 
@@ -91,21 +92,19 @@ export default function GPTChatSimulation() {
     setChat(newChat);
     setInput("");
 
-    function generateTravelerReply(input) {
-  for (const key of profile.required) {
-    const keywords = profile.keywords?.[key] || [];
-    if (keywords.some(phrase => input.includes(phrase))) {
-      return profile.responses?.[key] || "That's a good question.";
+    const reply = generateTravelerReply(trimmed.toLowerCase());
+    const updatedChat = [...newChat, { id: uuidv4(), sender: "traveler", text: reply }];
+    setChat(updatedChat);
+
+    const newAsked = [...asked];
+    for (const key of profile.required) {
+      const triggers = profile.keywords?.[key] || [];
+      if (triggers.some(trigger => trimmed.includes(trigger)) && !newAsked.includes(key)) {
+        newAsked.push(key);
+      }
     }
-  }
-  return "I'm not sure what you mean. Could you rephrase it?";
-}
 
-
-    const matched = profile.required.filter(req => trimmed.includes(req));
-    const newAsked = [...new Set([...asked, ...matched])];
-
-    if (newAsked.length >= 5 || updatedChat.filter(m => m.sender === "student").length >= 6) {
+    if (newAsked.length >= 3 || updatedChat.filter(m => m.sender === "student").length >= 6) {
       const redFlagHits = profile.redFlags.filter(flag => trimmed.includes(flag));
       const scoreTotal = newAsked.length * 10 + redFlagHits.length * 15;
       const feedback = [
@@ -128,13 +127,14 @@ export default function GPTChatSimulation() {
     setAsked(newAsked);
   };
 
-  async function generateTravelerReply(input) {
-    if (input.includes("purpose")) return "Just here to relax really.";
-    if (input.includes("visa")) return "I think I have a visa... maybe?";
-    if (input.includes("return")) return "I haven't booked a return ticket yet.";
-    if (input.includes("food") || input.includes("fruit")) return "Yes, some fruits and snacks.";
-    if (input.includes("work")) return "I might look for something part-time, who knows.";
-    return "Hmm... I’m not sure what you mean.";
+  function generateTravelerReply(input) {
+    for (const key of profile.required) {
+      const triggers = profile.keywords?.[key] || [];
+      if (triggers.some(trigger => input.includes(trigger))) {
+        return profile.responses?.[key] || "That's a good question.";
+      }
+    }
+    return "I'm not sure what you mean. Could you rephrase it?";
   }
 
   return (
@@ -144,7 +144,7 @@ export default function GPTChatSimulation() {
       {!done && (
         <div className="border rounded p-2 h-96 overflow-y-auto bg-gray-50 mb-2">
           {chat.map(entry => (
-            <div key={entry.id} className={`mb-1 ${entry.sender === "student" ? "text-blue-700" : "text-black"}`}>
+            <div key={entry.id} className={\`mb-1 \${entry.sender === "student" ? "text-blue-700" : "text-black"}\`}>
               <strong>{entry.sender === "student" ? "You" : "Traveler"}:</strong> {entry.text}
             </div>
           ))}
@@ -165,7 +165,7 @@ export default function GPTChatSimulation() {
           ))}
         </div>
       ) : (
-        <div className="flex gap-2">
+        <form onSubmit={handleSend} className="flex gap-2">
           <input
             className="border p-2 flex-1"
             value={input}
@@ -173,10 +173,10 @@ export default function GPTChatSimulation() {
             placeholder="Ask a question..."
           />
           <button
+            type="submit"
             className="bg-blue-600 text-white px-4 py-2 rounded"
-            onClick={handleSend}
           >Send</button>
-        </div>
+        </form>
       )}
     </div>
   );
