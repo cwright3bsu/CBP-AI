@@ -144,7 +144,7 @@ export default function GPTChatSimulation() {
       {!done && (
         <div className="border rounded p-2 h-96 overflow-y-auto bg-gray-50 mb-2">
           {chat.map(entry => (
-            <div key={entry.id} className={`mb-1 ${entry.sender === "student" ? "text-blue-700" : "text-black"}`}>
+            <div key={entry.id} className={\`mb-1 \${entry.sender === "student" ? "text-blue-700" : "text-black"}\`}>
               <strong>{entry.sender === "student" ? "You" : "Traveler"}:</strong> {entry.text}
             </div>
           ))}
