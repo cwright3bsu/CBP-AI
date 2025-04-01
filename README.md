@@ -1,20 +1,17 @@
-# Customs Officer GPT Chat Simulation
+# Customs Officer GPT Chat Simulation (Flexible Version)
 
-An interactive simulation where students act as customs officers, questioning travelers with hidden profiles and identifying red flags.
+This is a deployable version of the GPT-style customs officer training tool.
 
 ## Features
 
+- Flexible keyword and phrase matching
+- Traveler-specific responses
+- Scoring and red flag detection
 - Sequential traveler profiles
-- AI-like conversation simulation
-- Scoring and feedback after each interaction
 - Final evaluation summary
 
-## Getting Started
+## Setup
 
-1. Clone the repo
-2. Run `npm install`
-3. Run `npm run dev`
-
-## Deployment
-
-Deploy easily using [Vercel](https://vercel.com/import)
+1. Upload to GitHub
+2. Connect to Vercel
+3. Click Deploy!
